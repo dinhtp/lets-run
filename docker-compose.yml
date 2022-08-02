@@ -1,0 +1,145 @@
+version: '3.5'
+
+services:
+  # Gateway services
+  run-customer-rest:
+    image: localhost:5000/run-customer-service:latest
+    restart: always
+    command: run-customer-service serve rest
+    environment:
+      - ADDRESS=run-customer-rest:1400
+      - BACKEND=run-customer-grpc:1401
+    ports:
+      - '1400:9090'
+    depends_on:
+      - "run-customer-grpc"
+    hostname: run-customer-rest
+    container_name: run-customer-rest
+    networks:
+      - run
+
+  run-customer-grpc:
+    image: localhost:5000/run-customer-service:latest
+    restart: always
+    command: run-customer-service serve grpc
+    environment:
+      - BACKEND=run-customer-grpc:1401
+      - SHOPIFYCUSTOMER=shopify-customer-grpc:1404
+      - WOOCOMMERCECUSTOMER=woocommerce-customer-grpc:1405
+    ports:
+      - '1401:9090'
+    depends_on:
+      - "mysql"
+    hostname: run-customer-grpc
+    container_name: run-customer-grpc
+    networks:
+      - run
+
+  run-platform-rest:
+    image: localhost:5000/run-platform-service:latest
+    restart: always
+    command: run-platform-service serve rest
+    environment:
+      - ADDRESS=run-platform-rest:1402
+      - BACKEND=run-platform-grpc:1403
+    ports:
+      - '1402:9090'
+    depends_on:
+      - "run-platform-grpc"
+    hostname: run-platform-rest
+    container_name: run-platform-rest
+    networks:
+      - run
+
+  run-platform-grpc:
+    image: localhost:5000/run-platform-service:latest
+    restart: always
+    command: run-platform-service serve grpc
+    environment:
+      - BACKEND=run-platform-grpc:1403
+      - MYSQLDSN=root:root@tcp(${LAN_IP}:3306)/run?charset=utf8mb4&parseTime=True&loc=Local
+    ports:
+      - '1403:9090'
+    depends_on:
+      - "mysql"
+    hostname: run-platform-grpc
+    container_name: run-platform-grpc
+    networks:
+      - run
+
+  # Platform services
+  shopify-customer-grpc:
+    image: localhost:5000/shopify-customer-service:latest
+    restart: always
+    command: shopify-customer-service serve grpc
+    environment:
+      - BACKEND=shopify-customer-grpc:1404
+    ports:
+      - '1404:9090'
+    hostname: shopify-customer-grpc
+    container_name: shopify-customer-grpc
+    networks:
+      - run
+
+  woocommerce-customer-grpc:
+    image: localhost:5000/woocommerce-customer-service:latest
+    restart: always
+    command: woocommerce-customer-service serve grpc
+    environment:
+      - BACKEND=woocommerce-customer-grpc:1405
+    ports:
+      - '1405:9090'
+    hostname: woocommerce-customer-grpc
+    container_name: woocommerce-customer-grpc
+    networks:
+      - run
+
+  # Infrastructure services
+  mysql:
+    image: mysql:latest
+    restart: always
+    cap_add:
+      - ALL  # CAP_SYS_NICE
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=run
+      - MYSQL_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - '3306:3306'
+    hostname: mysql
+    container_name: mysql
+    networks:
+      - go
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_HOST=mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - '8080:80'
+    networks:
+      - go
+
+  nginx:
+    image: nginx:latest
+    restart: always
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - '80:80'
+      - '443:443'
+    expose:
+      - '80'
+      - '443'
+    hostname: nginx
+    container_name: nginx
+    networks:
+      - go
+
+networks:
+  go:
