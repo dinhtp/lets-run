@@ -24,6 +24,7 @@ services:
     command: run-customer-service serve grpc
     environment:
       - BACKEND=run-customer-grpc:1401
+      - PLATFORM=run-platform-grpc:1403
       - SHOPIFYCUSTOMER=shopify-customer-grpc:1404
       - WOOCOMMERCECUSTOMER=woocommerce-customer-grpc:1405
     ports:
