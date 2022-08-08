@@ -1,19 +1,18 @@
 # Let's RUN with Ecommerce
 
 ## What to do
-This assignment will help you familiarize with the micro service architecture based on Golang, 
-Cobra and Docker along with the service structure, coding conventions and basic workflow. 
-In this assignment, you are going to develop two services named **Company** and **Project** which perform 
-Create, Read, Update, Delete and List action with a few calculation logic. 
-These APIs will be exposed to both HTTP and GRPC client using Google Protocol Buffer.
+This assignment will help you apply the micro service architecture to develop a customer management gateway 
+for two types of ecommerce platform which are **Shopify** and **WooCommerce**. There will be two main services named 
+**Customer** and **Platform** which serve as an API gateway. **Platform** service will perform basic management features 
+for a list of supported ecommerce platforms. Meanwhile, **Customer** services will connect and forward the API request 
+to a designated platform. In order to establish a consensus in data structure, two services which represent 2 types of 
+ecommerce platform are introduced. These services will function as a client to the REST API gateway of **Shopify** and 
+**WooCommerce** as well as transform the platform specific data to the pre-defined structure.
 
 ### System architecture overview
-
-
-### System database overview
-
+![System Overview](./asset/system-overview.png)
   
-### This assignment consists of 4 repositories
+### This assignment consists of 6 repositories
 1. [Let's Run Docker](https://github.com/dinhtp/lets-run)
 2. [Let's Run PbType](https://github.com/dinhtp/lets-run-pbtype)
 3. [Customer Gateway Service](https://github.com/dinhtp/lets-run-customer)
@@ -23,7 +22,7 @@ These APIs will be exposed to both HTTP and GRPC client using Google Protocol Bu
 
 
 ##  Prerequisite
-- Complete [Let's Go](https://github.com/dinhtp/lets-go) assignment
+- Complete [Let's Go](https://github.com/dinhtp/lets-go) assignment.
 
 
 ## How to use
@@ -45,7 +44,7 @@ With each domain name, it is required to update the `hosts` file so that your lo
 For Linux users, the `hosts` file is located at `/etc/hosts`.
 For Windows users, the `hosts` file is located at `C:\Windows\System32\drivers\etc\hosts`.
 
-- Update the service domain name in the `hosts` file. For example: `127.0.0.1 api-go-company.local.com`
+- Update the service domain name in the `hosts` file. For example: `127.0.0.1 api-run-customer.local.com`
 - To bring up all the services in the docker compose file, run `./up`
 - Check if the service is up and running using `docker ps`
 
